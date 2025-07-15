@@ -16,6 +16,9 @@
             android:name=".NewMatchActivity"
             android:exported="false" />
         <activity
+            android:name=".ListPlayersActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddPlayerActivity"
             android:exported="false" />
         <activity
