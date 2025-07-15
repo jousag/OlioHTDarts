@@ -3,7 +3,6 @@ package com.example.oliohtdarts;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,33 +10,27 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class AddPlayerActivity extends AppCompatActivity {
-
-    private EditText NameInput;
+public class NewMatchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_add_player);
+        setContentView(R.layout.activity_new_match);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-
-            NameInput = findViewById(R.id.playerNameInput);
-
             return insets;
         });
     }
 
-
-    public void addPlayer(View view) {
-        String playerName = NameInput.getText().toString();
-        PlayerStorage.getInstance().addPlayer(new Player(playerName));
-
-        // After adding the player, switch back to the new match activity
-
-        Intent intent = new Intent(this, NewMatchActivity.class);
+    public void switchToMain(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
+    public void switchToAddPlayer(View view) {
+        Intent intent = new Intent(this, AddPlayerActivity.class);
+        startActivity(intent);
+    }
+
 }
