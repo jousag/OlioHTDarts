@@ -1,6 +1,8 @@
 package com.example.oliohtdarts;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,4 +23,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+    public void switchToNewMatch(View view) {
+        startActivity(new Intent(this, NewMatchActivity.class));
+    }
+
+
 }
