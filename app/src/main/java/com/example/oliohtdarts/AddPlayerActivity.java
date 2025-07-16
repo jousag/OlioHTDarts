@@ -1,43 +1,43 @@
 package com.example.oliohtdarts;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import android.widget.Toast;
 
 public class AddPlayerActivity extends AppCompatActivity {
-
-    private EditText NameInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_player);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-
-            NameInput = findViewById(R.id.playerNameInput);
-
-            return insets;
-        });
     }
 
-
     public void addPlayer(View view) {
-        String playerName = NameInput.getText().toString();
+        EditText playerNameInput = findViewById(R.id.playerNameInput);
+        String playerName = playerNameInput.getText().toString().trim();
+
+        if (playerName.isEmpty()) {
+            Toast.makeText(this, "Please enter a player name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Add the player to storage
         PlayerStorage.getInstance().addPlayer(new Player(playerName));
+        
+        Toast.makeText(this, "Player " + playerName + " added successfully!", Toast.LENGTH_SHORT).show();
 
-        // After adding the player, switch back to the new match activity
+        // Clear the input field
+        playerNameInput.setText("");
+        
+        // Optionally, you can navigate back to the previous activity
+        finish();
+    }
 
-        Intent intent = new Intent(this, NewMatchActivity.class);
-        startActivity(intent);
+    public void goBack(View view) {
+        finish();
     }
 }
