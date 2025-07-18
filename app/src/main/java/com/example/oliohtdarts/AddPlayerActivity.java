@@ -37,7 +37,6 @@ public class AddPlayerActivity extends AppCompatActivity {
         finish();
     }
 
-    public void goBack(View view) {
-        finish();
-    }
+    public void goBack(View view) {finish();}
+
 }

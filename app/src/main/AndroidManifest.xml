@@ -13,6 +13,9 @@
         android:theme="@style/Theme.OlioHTDarts"
         tools:targetApi="31">
         <activity
+            android:name=".PlayerList"
+            android:exported="false" />
+        <activity
             android:name=".NewMatchActivity"
             android:exported="false" />
         <activity

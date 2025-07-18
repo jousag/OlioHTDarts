@@ -3,19 +3,11 @@ package com.example.oliohtdarts;
 public class Player {
     private String name;
     private int score;
-
     private int highScore;
-
     private int playedGames;
-
     private float ThreeDartAverage;
-
     private int LastThreeDartScore;
-
     private int DartsThrown;
-
-
-
 
     public Player(String name) {
         this.name = name;
@@ -38,4 +30,11 @@ public class Player {
         this.score = 501; // Reset score to default starting value
     }
 
+    public int getPlayedGames() {
+        return playedGames;
+    }
+
+    public float getThreeDartAverage() {
+        return ThreeDartAverage;
+    }
 }

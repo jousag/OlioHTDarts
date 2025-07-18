@@ -9,8 +9,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class NewMatchActivity extends AppCompatActivity {
+
+    private PlayerStorage playerStorage;
+
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +25,21 @@ public class NewMatchActivity extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+
+            playerStorage = PlayerStorage.getInstance();
+            recyclerView = findViewById(R.id.ListPlayersRV);
+            recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
+            recyclerView.setAdapter(new PlayerListAdapter(getApplicationContext(), playerStorage.getPlayers()));
+
             return insets;
         });
+    }
+
+    protected void onResume() {
+        super.onResume();
+        if (recyclerView != null && playerStorage != null) {
+            recyclerView.setAdapter(new PlayerListAdapter(getApplicationContext(), playerStorage.getPlayers()));
+        } // Update the RecyclerView adapter with the latest player data
     }
 
     public void switchToMain(View view) {
@@ -38,4 +56,5 @@ public class NewMatchActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
 }
