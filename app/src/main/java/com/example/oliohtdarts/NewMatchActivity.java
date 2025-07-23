@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NewMatchActivity extends AppCompatActivity {
@@ -26,6 +27,7 @@ public class NewMatchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_new_match);
+        PlayerStorage.getInstance().loadPlayers(this); // Load players from storage
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -37,8 +39,8 @@ public class NewMatchActivity extends AppCompatActivity {
                     playerStorage.getPlayers(),
                     selectedPlayers ->  onPlayerClick(selectedPlayers)));
             txtSelectedPlayers = findViewById(R.id.txtSelectedPlayers);
-            txtSelectedPlayers.setText("No players selected");
 
+            updateSelectedPlayersText(new ArrayList<>());
             return insets;
         });
     }
@@ -52,6 +54,17 @@ public class NewMatchActivity extends AppCompatActivity {
         } // Update the RecyclerView adapter with the latest player data
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (Player player : PlayerStorage.getInstance().getPlayers()) {
+            player.setSelected(false); // Reset selection state when the activity is paused
+        }
+        PlayerStorage.getInstance().savePlayers(this);
+        // Save players to storage when the activity is paused
+    }
+
+
     public void switchToMain(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
@@ -63,15 +76,19 @@ public class NewMatchActivity extends AppCompatActivity {
     }
 
     public void onPlayerClick(List<String> selectedPlayers) {
+        updateSelectedPlayersText(selectedPlayers);
+    }
+    public void updateSelectedPlayersText(List<String> selectedPlayers) {
         if (selectedPlayers.isEmpty()) {
             txtSelectedPlayers.setText("No players selected");
         } else {
-            StringBuilder builder = new StringBuilder("Selected Players: ");
+            StringBuilder sb = new StringBuilder("Selected Players: ");
             for (String player : selectedPlayers) {
-                builder.append(player).append(", ");
+                sb.append(player).append(", ");
             }
-            builder.setLength(builder.length() - 2); // Remove the last comma and space
-            txtSelectedPlayers.setText(builder.toString());
+            // Remove the last comma and space
+            sb.setLength(sb.length() - 2);
+            txtSelectedPlayers.setText(sb.toString());
         }
     }
 }
