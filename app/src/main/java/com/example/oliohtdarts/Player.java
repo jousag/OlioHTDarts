@@ -1,7 +1,8 @@
 package com.example.oliohtdarts;
-import java.util.ArrayList;
-import java.util.List;
-public class Player {
+
+import java.io.Serializable;
+
+public class Player implements Serializable {
     private String name;
     private int score;
     private int highScore;
@@ -10,7 +11,6 @@ public class Player {
     private int LastThreeDartScore;
     private int DartsThrown;
     private boolean isSelected;
-    private ArrayList<Player> players;
 
     public Player(String name) {
         this.name = name;
@@ -41,11 +41,5 @@ public class Player {
     }
     public void setSelected(boolean selected) {
         isSelected = selected;
-    }
-
-    public void reduceScore(int value) {
-        if (value > 0 && value <= score) {
-            this.score -= value;
-        }
     }
 }

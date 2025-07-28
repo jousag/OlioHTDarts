@@ -1,15 +1,22 @@
 package com.example.oliohtdarts;
 
+import android.content.Context;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class PlayerStorage {
+    final private String FILENAME;
     private static PlayerStorage playerStorage;
     private ArrayList<Player> players;
 
-    private ArrayList<Player> selected;
 
-    private PlayerStorage() {
+    public PlayerStorage() {
         players = new ArrayList<>();
+        FILENAME = "players.data";
     }
 
     public static PlayerStorage getInstance() {
@@ -18,6 +25,7 @@ public class PlayerStorage {
         }
         return playerStorage;
     }
+
 
     public ArrayList<Player> getPlayers() {
         return players;
@@ -50,14 +58,24 @@ public class PlayerStorage {
             players.remove(player);
         }
     }
-
-    public ArrayList<Player> getSelected() {
-        ArrayList<Player> selected = new ArrayList<>();
-        for (Player player : players)
-            if (player.isSelected()) {
-                selected.add(player);
-            }
-        return selected;
+    public void savePlayers(Context context) {
+        try {
+            ObjectOutputStream entityWriter = new ObjectOutputStream(context.openFileOutput(FILENAME, Context.MODE_PRIVATE));
+            entityWriter.writeObject(players);
+            entityWriter.close();
+            System.out.println("Pelaajat tallennettu onnistuneesti.");
+        } catch (Exception e) {
+            System.out.println("Virhe pelaajien tallentamisessa: " + e.getMessage());
+        }
     }
-
+    public void loadPlayers(Context context) {
+        try {
+            ObjectInputStream entityReader = new ObjectInputStream(context.openFileInput(FILENAME));
+            players = (ArrayList<Player>) entityReader.readObject();
+            entityReader.close();
+            System.out.println("Pelaajat ladattu onnistuneesti.");
+        } catch (Exception e) {
+            System.out.println("Virhe pelaajien lataamisessa: " + e.getMessage());
+        }
+    }
 }

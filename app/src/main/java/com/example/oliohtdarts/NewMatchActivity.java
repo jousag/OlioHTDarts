@@ -74,8 +74,4 @@ public class NewMatchActivity extends AppCompatActivity {
             txtSelectedPlayers.setText(builder.toString());
         }
     }
-    public void switchToMatch(View view) {
-        startActivity(new Intent(this, GameView.class));
-    }
-
 }
