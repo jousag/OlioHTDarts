@@ -6,6 +6,8 @@ public class PlayerStorage {
     private static PlayerStorage playerStorage;
     private ArrayList<Player> players;
 
+    private ArrayList<Player> selected;
+
     private PlayerStorage() {
         players = new ArrayList<>();
     }
@@ -48,4 +50,14 @@ public class PlayerStorage {
             players.remove(player);
         }
     }
+
+    public ArrayList<Player> getSelected() {
+        ArrayList<Player> selected = new ArrayList<>();
+        for (Player player : players)
+            if (player.isSelected()) {
+                selected.add(player);
+            }
+        return selected;
+    }
+
 }

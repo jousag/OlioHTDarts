@@ -18,6 +18,9 @@
             android:name=".PlayerList"
             android:exported="false" />
         <activity
+            android:name=".GameView"
+            android:exported="false" />
+        <activity
             android:name=".NewMatchActivity"
             android:exported="false" />
         <activity
