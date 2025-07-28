@@ -11,11 +11,14 @@ public class Player implements Serializable {
     private int LastThreeDartScore;
     private int DartsThrown;
     private boolean isSelected;
+    private int image;
 
     public Player(String name) {
         this.name = name;
         this.score = 501; // Default starting score for a game of darts
         this.isSelected = false;
+
+        image = R.drawable.dartsimage;
     }
 
     public String getName() {
@@ -42,4 +45,9 @@ public class Player implements Serializable {
     public void setSelected(boolean selected) {
         isSelected = selected;
     }
+    public int getImage() {return image;}
+
+    public int getHighScore() {return highScore;}
+
+    public int getDartsThrown() {return DartsThrown;}
 }

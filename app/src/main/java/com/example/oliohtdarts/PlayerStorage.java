@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerStorage {
     final private String FILENAME;
@@ -64,12 +65,13 @@ public class PlayerStorage {
             System.out.println((i + 1) + ". " + player.getName() + " - Score: " + player.getScore());
         }
     }
-    
+
     public void removePlayer(Player player) {
         if (players != null) {
             players.remove(player);
         }
     }
+
     public void savePlayers(Context context) {
         try {
             ObjectOutputStream entityWriter = new ObjectOutputStream(context.openFileOutput(FILENAME, Context.MODE_PRIVATE));
@@ -80,6 +82,7 @@ public class PlayerStorage {
             System.out.println("Virhe pelaajien tallentamisessa: " + e.getMessage());
         }
     }
+
     public void loadPlayers(Context context) {
         try {
             ObjectInputStream entityReader = new ObjectInputStream(context.openFileInput(FILENAME));
@@ -89,5 +92,25 @@ public class PlayerStorage {
         } catch (Exception e) {
             System.out.println("Virhe pelaajien lataamisessa: " + e.getMessage());
         }
+    }
+
+    public Player getPlayerByName(String name) {
+        for (Player player : players) {
+            if (player.getName().equals(name)) {
+                return player;
+            }
+        }
+        System.out.println("Pelaajaa ei löytynyt nimellä: " + name);
+        return null;
+    }
+
+    public List<String> getSelectedPlayers() {
+        List<String> selectedPlayers = new ArrayList<>();
+        for (Player player : players) {
+            if (player.isSelected()) {
+                selectedPlayers.add(player.getName());
+            }
+        }
+        return selectedPlayers;
     }
 }

@@ -70,5 +70,4 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerViewHolder> {
     public interface OnPlayerClickListener {
         void onPlayerClick(List<String> selectedPlayers);
     }
-
 }

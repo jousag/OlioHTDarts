@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     public void switchToNewMatch(View view) {
         startActivity(new Intent(this, NewMatchActivity.class));
     }
+    public void switchToPlayerList(View view) {
+        startActivity(new Intent(this, PlayerListActivity.class));
+    }
 
 
 }
