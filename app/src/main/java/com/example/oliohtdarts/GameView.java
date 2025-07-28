@@ -15,15 +15,18 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class GameView extends AppCompatActivity {
     private int throwCount = 0;
     private int[] selectedThrows = new int[3];
+    private int startScore = 501;
+    private int currentPlayerIndex = 0;
     private EditText scoreEditText;
     private TextView player1Name;
     private TextView player2Name;
-    private int currentPlayerIndex = 0;
+    private TextView scoreEditText1;
+    private TextView scoreEditText2;
+
     private ArrayList<TextView> playerScoreViews = new ArrayList<>();
 
 
@@ -38,30 +41,28 @@ public class GameView extends AppCompatActivity {
             return insets;
         });
 
-        scoreEditText = findViewById(R.id.scoreEditText1);
-        scoreEditText = findViewById(R.id.scoreEditText2);
+        scoreEditText1 = findViewById(R.id.scoreEditText1);
+        scoreEditText2 = findViewById(R.id.scoreEditText2);
         player1Name = findViewById(R.id.player1Name);
         player2Name = findViewById(R.id.player2Name);
 
         PlayerStorage playerStorage = PlayerStorage.getInstance();
         ArrayList<Player> selectedPlayers = playerStorage.getSelected();
 
-        Player player = Player.getInstance();
-        score = Player.getScore();
 
-        for (int i = 0; i < selectedPlayers.size(); i++) {
-            String textViewId = "player" + (i + 1) + "Name"; // e.g., player1Name, player2Name...
+
+        for (int index = 0; index < selectedPlayers.size(); index++) {
+            String textViewId = "player" + (index + 1) + "Name"; // e.g., player1Name, player2Name...
             @SuppressLint("DiscouragedApi") int resID = getResources().getIdentifier(textViewId, "id", getPackageName());
             TextView playerNameView = findViewById(resID);
 
             if (playerNameView != null) {
-                playerNameView.setText(selectedPlayers.get(i).getName());
+                playerNameView.setText(selectedPlayers.get(index).getName());
             }
         }
-    }
 
-        for (int i = 0; i < selectedPlayers.size(); i++) {
-            String scoreViewId = "player" + (i + 1) + "Score"; // e.g., player1Score
+        for (int index = 0; index < selectedPlayers.size(); index++) {
+            String scoreViewId = "player" + (index + 1) + "Score"; // e.g., player1Score
             @SuppressLint("DiscouragedApi")
             int resID = getResources().getIdentifier(scoreViewId, "id", getPackageName());
             TextView scoreView = findViewById(resID);
@@ -69,7 +70,7 @@ public class GameView extends AppCompatActivity {
             if (scoreView != null) {
                 playerScoreViews.add(scoreView);
                 // Initialize display with starting score
-                scoreView.setText(String.valueOf(selectedPlayers.get(i).getScore()));
+                scoreView.setText(String.valueOf(selectedPlayers.get(index).getScore()));
             }
         }
 
@@ -84,18 +85,8 @@ public class GameView extends AppCompatActivity {
             }
         }
     }
-//    private void setSelectedPlayerNames(ArrayList<Player> selectedPlayers) {
-//        TextView player1Name = findViewById(R.id.player1Name);
-//        TextView player2Name = findViewById(R.id.player2Name);
-//
-//        if (selectedPlayers.size() >= 1) {
-//            player1Name.setText(selectedPlayers.get(0).getName());
-//        }
-//        if (selectedPlayers.size() >= 2) {
-//            player2Name.setText(selectedPlayers.get(1).getName());
-//        }
-//    }
     private void handleScoreInput(int value) {
+
         if (throwCount < 3) {
             selectedThrows[throwCount] = value;
             throwCount++;
@@ -117,18 +108,6 @@ public class GameView extends AppCompatActivity {
             // Move to next player
             currentPlayerIndex = (currentPlayerIndex + 1) % selectedPlayers.size();
             throwCount = 0;
-        }
-    }
-
-    private void setSelectedPlayerNames(@NonNull ArrayList<Player> selectedPlayers) {
-        for (int i = 0; i < selectedPlayers.size(); i++) {
-            String textViewId = "player" + (i + 1) + "Name"; // e.g., player1Name, player2Name...
-            @SuppressLint("DiscouragedApi") int resID = getResources().getIdentifier(textViewId, "id", getPackageName());
-            TextView playerNameView = findViewById(resID);
-
-            if (playerNameView != null) {
-                playerNameView.setText(selectedPlayers.get(i).getName());
-            }
         }
     }
 

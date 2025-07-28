@@ -12,12 +12,14 @@ public class PlayerStorage {
     final private String FILENAME;
     private static PlayerStorage playerStorage;
     private ArrayList<Player> players;
+    private ArrayList<Player> selected;
 
 
     public PlayerStorage() {
         players = new ArrayList<>();
         FILENAME = "players.data";
     }
+
 
     public static PlayerStorage getInstance() {
         if (playerStorage == null) {
@@ -44,6 +46,16 @@ public class PlayerStorage {
             players = new ArrayList<>();
         }
         players.add(player);
+    }
+
+    public ArrayList<Player> getSelected() {
+        ArrayList<Player> selected = new ArrayList<>();
+        for (Player player : players) {
+            if (player.isSelected()) {
+                selected.add(player);
+            }
+        }
+        return selected;
     }
 
     public void listPlayers() {
