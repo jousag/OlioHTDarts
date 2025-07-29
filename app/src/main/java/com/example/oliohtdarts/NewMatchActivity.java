@@ -28,7 +28,7 @@ public class NewMatchActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_new_match);
         PlayerStorage.getInstance().loadPlayers(this); // Load players from storage
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.player1score), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
 
@@ -90,5 +90,10 @@ public class NewMatchActivity extends AppCompatActivity {
             sb.setLength(sb.length() - 2);
             txtSelectedPlayers.setText(sb.toString());
         }
+    }
+
+    public void switchToMatch(View view) {
+        Intent intent = new Intent(this, GameView.class);
+        startActivity(intent);
     }
 }
