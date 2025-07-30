@@ -50,4 +50,5 @@ public class Player implements Serializable {
     public int getHighScore() {return highScore;}
 
     public int getDartsThrown() {return DartsThrown;}
+
 }

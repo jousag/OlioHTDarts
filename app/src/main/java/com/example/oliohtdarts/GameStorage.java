@@ -28,4 +28,13 @@ public class GameStorage {
     public ArrayList<Game> getAllGames() {
         return games;
     }
+    public int getNextGameId() {
+        return games.size() + 1; // Simple ID generation based on size
+    }
+    public static GameStorage getInstance() {
+        
+        return gameStorage;
+    }
+
+    private static GameStorage gameStorage;
 }

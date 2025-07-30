@@ -106,7 +106,7 @@ public class GameView extends AppCompatActivity {
 
         PlayerStorage playerStorage = PlayerStorage.getInstance();
         selectedPlayers = playerStorage.getSelected();
-
+        
         // Initialize all selected players if none are selected (for testing)
         if (selectedPlayers.isEmpty()) {
             // Add some sample selected players for testing
@@ -274,7 +274,7 @@ public class GameView extends AppCompatActivity {
 
             // Update player score
             int newScore = currentPlayer.getScore() - total;
-            
+
             // Check for valid score (can't go below 0 in darts)
             if (newScore >= 0) {
                 currentPlayer.setScore(newScore);
