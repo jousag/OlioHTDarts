@@ -24,6 +24,7 @@ public class PlayerListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_player_list);
+        PlayerStorage.getInstance().loadPlayers(this); // Load players from storage
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.player1score), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -37,11 +38,20 @@ public class PlayerListActivity extends AppCompatActivity {
             return insets;
         });
     }
+    protected void onResume() {
+        super.onResume();
+        if (recyclerView != null && playerStorage != null) {
+            recyclerView.setAdapter(new PlayerListAdapter(getApplicationContext(),
+                    playerStorage.getPlayers(),
+                    selectedPlayers ->  onPlayerClick(selectedPlayers)));
+        } // Update the RecyclerView adapter with the latest player data
+    }
 
     public void onPlayerClick(List<String> selectedPlayers) {
         Intent intent = new Intent(this, PlayerStats.class);
         startActivity(intent);
     }
+
 
     public void switchToMain(View view) {
         Intent intent = new Intent(this, MainActivity.class);

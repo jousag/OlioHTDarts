@@ -32,29 +32,31 @@ public class PlayerStats extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.player1score), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            playerName = findViewById(R.id.textPlayerName);
+            playerName = findViewById(R.id.txtPlayerName);
             player3DartAverage = findViewById(R.id.textPlayerThreeDartAVG);
             playerGamesPlayed = findViewById(R.id.textPlayerGamesPlayed);
             playerCheckout = findViewById(R.id.textPlayerCheckout);
             playerDartsThrown = findViewById(R.id.textPlayerDartsThrown);
             playerStorage = PlayerStorage.getInstance();
             playerImage = findViewById(R.id.imageView);
-
-            updatePlayerStats(new ArrayList<>());
+            System.out.println("Player stats created");
+            updatePlayerStats(playerStorage.getSelectedPlayers());
             return insets;
         });
     }
 
+
     public void updatePlayerStats(List<String> selectedPlayers) {;
 
         if (selectedPlayers.isEmpty()) {
+            System.out.println("Listan pituus ja lista: " + selectedPlayers.size() + " " + selectedPlayers);
             playerName.setText("No player selected");
             playerImage.setImageResource(R.drawable.dartsimage);
         } else {
             String playerNameText = selectedPlayers.get(0);
             Player player = playerStorage.getPlayerByName(playerNameText);
             if (player != null) {
-                playerName.setText(player.getName());
+                playerName.setText(playerNameText);
                 // Set the player's image, assuming you have a method to get the image resource
                 playerImage.setImageResource(player.getImage());
                 player3DartAverage.setText("3 Dart Average: " + player.getThreeDartAverage());
@@ -92,6 +94,8 @@ public class PlayerStats extends AppCompatActivity {
 
 
         }
+        PlayerStorage.getInstance().savePlayers(this);
+        // Save players to storage when the activity is paused
         Intent intent = new Intent(this, PlayerListActivity.class);
         startActivity(intent);
     }
