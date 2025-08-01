@@ -4,18 +4,18 @@ public class Game {
     private int gameId;
     private String player1;
     private String player2;
-    private int winnerId;
+    private String winnerName;
     private int player1throws;
     private int player2throws;
     private int player1score;
     private int player2score;
     private String gameType; //"301", "501", "701", etc.
 
-    public Game(int gameId, String player1, String player2, int winnerId, int player1throws, int player2throws, int player1score, int player2score, String gameType) {
+    public Game(int gameId, String player1, String player2, String winnerName, int player1throws, int player2throws, int player1score, int player2score, String gameType) {
         this.gameId = gameId;
         this.player1 = player1;
         this.player2 = player2;
-        this.winnerId = winnerId;
+        this.winnerName = winnerName;
         this.player1throws = player1throws;
         this.player2throws = player2throws;
         this.player1score = player1score;
@@ -31,9 +31,7 @@ public class Game {
     public String getPlayer2() {
         return player2;
     }
-    public int getWinnerId() {
-        return winnerId;
-    }
+    public String getWinnerName() {return winnerName;}
     public int getPlayer1throws() {
         return player1throws;
     }
@@ -62,8 +60,8 @@ public class Game {
     public void setPlayer2(String player2) {
         this.player2 = player2;
     }
-    public void setWinnerId(int winnerId) {
-        this.winnerId = winnerId;
+    public void setWinnerName(String winnerName) {
+        this.winnerName = winnerName;
     }
     public void setPlayer1throws(int player1throws) {
         this.player1throws = player1throws;

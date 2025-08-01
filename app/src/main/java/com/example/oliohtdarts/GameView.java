@@ -2,6 +2,7 @@ package com.example.oliohtdarts;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,9 @@ public class GameView extends AppCompatActivity {
     private int lastPlayerIndex = -1; // For undo functionality
     private int[] lastThrows = new int[3]; // For undo functionality
     private int lastScore = -1; // For undo functionality
+    private int GameId = 0; // Game ID for tracking games
+    private int player1throws = 0;
+    private int player2throws = 0;
     private EditText scoreEditText;
     private TextView player1Name;
     private TextView player2Name;
@@ -51,6 +55,8 @@ public class GameView extends AppCompatActivity {
     private ArrayList<TextView> playerScoreViews = new ArrayList<>();
     private ArrayList<Player> selectedPlayers = new ArrayList<>();
 
+    private GameStorage gameStorage;
+
 
 
     @Override
@@ -61,8 +67,10 @@ public class GameView extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.player1score), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            gameStorage = GameStorage.getInstance();
             return insets;
         });
+
 
         player1Score = findViewById(R.id.player1Score);
         player2Score = findViewById(R.id.player2Score);
@@ -105,6 +113,7 @@ public class GameView extends AppCompatActivity {
         inputView3 = findViewById(R.id.inputView3);
 
         PlayerStorage playerStorage = PlayerStorage.getInstance();
+        //GameStorage gameStorage = GameStorage.getInstance();
         selectedPlayers = playerStorage.getSelected();
         
         // Initialize all selected players if none are selected (for testing)
@@ -287,7 +296,21 @@ public class GameView extends AppCompatActivity {
                 // Check for winner (score = 0)
                 if (newScore == 0) {
                     System.out.println("Player " + currentPlayer.getName() + " wins!");
+                    Game game = new Game(GameId,
+                            selectedPlayers.get(0).getName(),
+                            selectedPlayers.get(1).getName(),
+                            currentPlayer.getName(),
+                                    player1throws,
+                                    player2throws,
+                                    selectedPlayers.get(0).getScore(),
+                                    selectedPlayers.get(1).getScore(),
+                                    "501");
+                    game.setWinnerName(currentPlayer.getName());
+                    GameId = gameStorage.getNextGameId();
+                    gameStorage.addGame(game);
                     // Handle winner logic here - for now, just continue the game
+                    Intent intent = new Intent(this, EndViewActivity.class);
+                    startActivity(intent);
                 }
             } else {
                 // Invalid throw - score would go below 0, this is called a "bust"

@@ -1,0 +1,91 @@
+package com.example.oliohtdarts;
+
+import static androidx.core.content.ContextCompat.startActivity;
+
+import android.animation.ValueAnimator;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class EndViewActivity extends AppCompatActivity {
+
+    private final int[] rainbowColors = {
+            Color.RED,
+            Color.MAGENTA,
+            Color.BLUE,
+            Color.CYAN,
+            Color.GREEN,
+            Color.YELLOW,
+            Color.RED // Loop back to red
+    };
+
+    private GameStorage gameStorage;
+
+    TextView winnerNameTextView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_end_view);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            gameStorage = GameStorage.getInstance();
+            winnerNameTextView = findViewById(R.id.textWinnerName);
+            winnerNameTextView.setText(gameStorage.getAllGames().get(gameStorage.getAllGames().size() - 1).getWinnerName());
+
+            animateSmoothRainbow(winnerNameTextView);
+            return insets;
+        });
+    }
+
+    public void switchToNewMatch(View view) {
+        // Start a new match
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    public void switchToRematch(View view) {
+        Intent intent = new Intent(this, GameView.class);
+        startActivity(intent);
+    }
+
+
+    private void animateSmoothRainbow(final TextView textView) {
+        ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+        animator.setDuration(2000);
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.addUpdateListener(animation -> {
+            float fraction = animation.getAnimatedFraction();
+            int startColor = getCurrentRainbowColor(fraction);
+            textView.setTextColor(startColor);
+        });
+        animator.start();
+    }
+
+    // Interpolate between multiple rainbow colors
+    private int getCurrentRainbowColor(float fraction) {
+        int index = (int) (fraction * (rainbowColors.length - 1));
+        int nextIndex = (index + 1) % rainbowColors.length;
+        float localFraction = (fraction * (rainbowColors.length - 1)) - index;
+
+        return blendColors(rainbowColors[index], rainbowColors[nextIndex], localFraction);
+    }
+
+    private int blendColors(int color1, int color2, float ratio) {
+        final float inverseRatio = 1 - ratio;
+        float r = Color.red(color1) * inverseRatio + Color.red(color2) * ratio;
+        float g = Color.green(color1) * inverseRatio + Color.green(color2) * ratio;
+        float b = Color.blue(color1) * inverseRatio + Color.blue(color2) * ratio;
+        return Color.rgb((int) r, (int) g, (int) b);
+    }
+}
