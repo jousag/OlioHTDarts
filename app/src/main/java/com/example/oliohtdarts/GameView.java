@@ -227,7 +227,6 @@ public class GameView extends AppCompatActivity {
     }
     // This method updates the UI to reflect the current player's turn
     private void updateCurrentPlayerUI() {
-        // Reset both players' text color to normal
         if (player1Name != null) player1Name.setTextColor(getResources().getColor(android.R.color.black, null));
         if (player2Name != null) player2Name.setTextColor(getResources().getColor(android.R.color.black, null));
         
@@ -251,28 +250,9 @@ public class GameView extends AppCompatActivity {
             int actualValue = value * nextMultiplier; // ActualValue = the score with multiplier
             selectedThrows[throwCount] = actualValue; // selectedThrows[throwCount] = listed score with multiplier
             throwCount++;
-            
-            // Update input views to show current throws
-            if (throwCount >= 1) {
-                clearInputViews();
-                inputView1.setText(String.valueOf(selectedThrows[0]));
-            }
-            if (throwCount >= 2) {
-                inputView2.setText(String.valueOf(selectedThrows[1]));
-            }
-            if (throwCount >= 3) {
-                inputView3.setText(String.valueOf(selectedThrows[2]));
-            }
-            updateInputViews();
-            
             Player currentPlayer = selectedPlayers.get(currentPlayerIndex); // Calculate and show potential newScore after this throw
-            int currentTotal = 0;
-            for (int i = 0; i < throwCount; i++) {
-                currentTotal += selectedThrows[i];
-            }
-
-            int newScore = currentPlayer.getScore() - currentTotal;
-            playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
+            
+            int newScore = setCurrentScore();
             if (newScore == 1 || newScore < 0) {
                 bustTurn();
             }
@@ -284,37 +264,35 @@ public class GameView extends AppCompatActivity {
         }
 
         if (throwCount == 3) {
-            int total = selectedThrows[0] + selectedThrows[1] + selectedThrows[2];
             Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
 
             // Save current state for undo functionality
             lastPlayerIndex = currentPlayerIndex;
             lastScore = currentPlayer.getScore();
             lastThrows = selectedThrows.clone();
-            // Update the player's score
-            int currentTotal = 0;
-            int newScore = currentPlayer.getScore() - total;
+            
+            // Calculate and display the potential newScore using setCurrentScore
+            int newScore = setCurrentScore();
 
             if (newScore >= 0 && newScore != 1) {
+                // Now actually set the player's score permanently
                 currentPlayer.setScore(newScore);
-
-                // Update the UI score TextView
-                if (currentPlayerIndex < playerScoreViews.size()) {
-                    playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
-                }
 
                 // Check for winner (score = 0)
                 if (newScore == 0 && nextMultiplier == 2) {
                     finishGame(currentPlayer);
+                    return; // Exit early if game is finished
                 }
+                
+                // Move to next player after successful turn
                 moveToNextPlayer();
             } else {
                 bustTurn();
+                // After bust, still move to next player
+                moveToNextPlayer();
             }
-
-
-            updateCurrentPlayerUI();   
         }
+        updateInputViews();
     }
 
     // Handle double and triple multipliers
@@ -348,8 +326,6 @@ public class GameView extends AppCompatActivity {
             int newScore = currentPlayer.getScore() - currentTotal;
             playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
             updateInputViews();
-            
-            System.out.println("Undid throw from current turn - throws remaining: " + throwCount);
         }
         // If no throws in current turn, try to undo from previous turn
         else if (lastPlayerIndex != -1 && lastScore != -1) {
@@ -384,12 +360,7 @@ public class GameView extends AppCompatActivity {
     
     // Update the input views to show individual throw scores
     private void updateInputViews() {
-        // Clear all input views first
-        inputView1.setText("");
-        inputView2.setText("");
-        inputView3.setText("");
-        
-        // Update based on current throw count
+        clearInputViews();
         if (throwCount >= 1) {
             inputView1.setText(String.valueOf(selectedThrows[0]));
         }
@@ -442,6 +413,25 @@ public class GameView extends AppCompatActivity {
         selectedThrows = new int[3];
         updateCurrentPlayerUI();
         clearInputViews();
+    }
+
+    private int setCurrentScore() {
+        if (currentPlayerIndex < selectedPlayers.size()) {
+            Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
+            
+            // Calculate potential newScore based on current throws
+            int currentTotal = 0;
+            for (int i = 0; i < throwCount; i++) {
+                currentTotal += selectedThrows[i];
+            }
+            int newScore = currentPlayer.getScore() - currentTotal;
+            
+            // Only update the UI display, don't change the actual player score yet
+            playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
+            
+            return newScore;
+        }
+        return -1; // Return -1 if no valid player
     }
 
 }
