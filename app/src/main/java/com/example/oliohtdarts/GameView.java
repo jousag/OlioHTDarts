@@ -239,32 +239,46 @@ public class GameView extends AppCompatActivity {
                 player2Name.setTextColor(getResources().getColor(android.R.color.holo_green_dark, null));
             }
         }
-        
-        // Clear input views when switching to a new player (but keep them if it's the same player)
-        if (throwCount == 0) {
-            clearInputViews();
-        }
     }
+
+
     private void handleScoreInput(int value) {
         // Check if we have selected players
         if (selectedPlayers.isEmpty()) {
             return;
         }
-
         if (throwCount < 3) {
-            // Apply multiplier to the current throw
-            int actualValue = value * nextMultiplier;
-            selectedThrows[throwCount] = actualValue;
+            int actualValue = value * nextMultiplier; // ActualValue = the score with multiplier
+            selectedThrows[throwCount] = actualValue; // selectedThrows[throwCount] = listed score with multiplier
             throwCount++;
             
             // Update input views to show current throws
+            if (throwCount >= 1) {
+                clearInputViews();
+                inputView1.setText(String.valueOf(selectedThrows[0]));
+            }
+            if (throwCount >= 2) {
+                inputView2.setText(String.valueOf(selectedThrows[1]));
+            }
+            if (throwCount >= 3) {
+                inputView3.setText(String.valueOf(selectedThrows[2]));
+            }
             updateInputViews();
             
-            // Debug: Show current throw
-            System.out.println("Player " + (currentPlayerIndex + 1) + " - Throw " + throwCount + ": " + value + 
-                             (nextMultiplier > 1 ? " x" + nextMultiplier + " = " + actualValue : ""));
-            
-            // Reset multiplier and button colors after use
+            Player currentPlayer = selectedPlayers.get(currentPlayerIndex); // Calculate and show potential newScore after this throw
+            int currentTotal = 0;
+            for (int i = 0; i < throwCount; i++) {
+                currentTotal += selectedThrows[i];
+            }
+
+            int newScore = currentPlayer.getScore() - currentTotal;
+            playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
+            if (newScore == 1 || newScore < 0) {
+                bustTurn();
+            }
+            if (newScore == 0 && nextMultiplier == 2) {
+                finishGame(currentPlayer);
+            }
             nextMultiplier = 1;
             resetMultiplierButtons();
         }
@@ -277,15 +291,11 @@ public class GameView extends AppCompatActivity {
             lastPlayerIndex = currentPlayerIndex;
             lastScore = currentPlayer.getScore();
             lastThrows = selectedThrows.clone();
-
-            // Debug: Show total
-            System.out.println("Player " + (currentPlayerIndex + 1) + " - Total: " + total);
-
-            // Update player score
+            // Update the player's score
+            int currentTotal = 0;
             int newScore = currentPlayer.getScore() - total;
 
-            // Check for valid score (can't go below 0 in darts)
-            if (newScore >= 0) {
+            if (newScore >= 0 && newScore != 1) {
                 currentPlayer.setScore(newScore);
 
                 // Update the UI score TextView
@@ -294,100 +304,72 @@ public class GameView extends AppCompatActivity {
                 }
 
                 // Check for winner (score = 0)
-                if (newScore == 0) {
-                    System.out.println("Player " + currentPlayer.getName() + " wins!");
-                    Game game = new Game(GameId,
-                            selectedPlayers.get(0).getName(),
-                            selectedPlayers.get(1).getName(),
-                            currentPlayer.getName(),
-                                    player1throws,
-                                    player2throws,
-                                    selectedPlayers.get(0).getScore(),
-                                    selectedPlayers.get(1).getScore(),
-                                    "501");
-                    game.setWinnerName(currentPlayer.getName());
-                    GameId = gameStorage.getNextGameId();
-                    gameStorage.addGame(game);
-                    // Handle winner logic here - for now, just continue the game
-                    Intent intent = new Intent(this, EndViewActivity.class);
-                    startActivity(intent);
+                if (newScore == 0 && nextMultiplier == 2) {
+                    finishGame(currentPlayer);
                 }
+                moveToNextPlayer();
             } else {
-                // Invalid throw - score would go below 0, this is called a "bust"
-                System.out.println("BUST! Player " + currentPlayer.getName() + " - score would be " + newScore);
-                // In real darts, the player's score stays the same and turn ends
+                bustTurn();
             }
 
-            // Move to next player
-            currentPlayerIndex = (currentPlayerIndex + 1) % selectedPlayers.size();
-            throwCount = 0;
-            
-            // Clear the selected throws array for next round
-            selectedThrows = new int[3];
-            
-            // Update UI to show current player
-            updateCurrentPlayerUI();
+
+            updateCurrentPlayerUI();   
         }
     }
-    
+
     // Handle double and triple multipliers
     private void handleDoubleTriple(int multiplier) {
-        // Set the multiplier for the next dart throw
-        nextMultiplier = multiplier;
-        
-        // Visual feedback - change button color to indicate it's active
-        if (multiplier == 2) {
-            buttonDouble.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light, null));
-            buttonTriple.setBackgroundColor(getResources().getColor(android.R.color.darker_gray, null));
-        } else if (multiplier == 3) {
-            buttonTriple.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light, null));
-            buttonDouble.setBackgroundColor(getResources().getColor(android.R.color.darker_gray, null));
-        }
-        
-        System.out.println("Next dart will be multiplied by " + multiplier);
-    }
-    
-    // Handle undo functionality
-    private void handleUndo() {
-        // Check if there's something to undo
-        if (lastPlayerIndex == -1 || lastScore == -1) {
-            System.out.println("Nothing to undo");
-            return;
-        }
-        
-        // Restore the previous player's score
-        if (lastPlayerIndex < selectedPlayers.size()) {
-            Player playerToRestore = selectedPlayers.get(lastPlayerIndex);
-            playerToRestore.setScore(lastScore);
-            
-            // Update the UI
-            if (lastPlayerIndex < playerScoreViews.size()) {
-                playerScoreViews.get(lastPlayerIndex).setText(String.valueOf(lastScore));
-            }
-            
-            // Go back to the previous player
-            currentPlayerIndex = lastPlayerIndex;
-            throwCount = 3; // Set to 3 to show all throws from the undone turn
-            
-            // Restore the previous throws
-            selectedThrows = lastThrows.clone();
-            
-            // Update input views to show the restored throws
-            updateInputViews();
-            
-            // Reset throw count to 0 for the next input
-            throwCount = 0;
-            
-            // Reset multiplier
+        if (nextMultiplier == multiplier) { // Cancels the multiplier if already active
             nextMultiplier = 1;
             resetMultiplierButtons();
+        } else { // Activate the new multiplier
+            resetMultiplierButtons();
+            nextMultiplier = multiplier;
+            if (nextMultiplier == 2) {
+                buttonDouble.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light, null));
+                buttonTriple.setBackgroundColor(getResources().getColor(android.R.color.darker_gray, null));
+            } else if (nextMultiplier == 3) {
+                buttonTriple.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light, null));
+                buttonDouble.setBackgroundColor(getResources().getColor(android.R.color.darker_gray, null));
+            }
+        }
+    }
+    
+    // Handle undo functionality - undoes the last individual throw (including from previous turn)
+    private void handleUndo() {
+        if (throwCount > 0) {
+            throwCount--;
+            selectedThrows[throwCount] = 0; // Clear the last throw value
+            Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
+            int currentTotal = 0;
+            for (int i = 0; i < throwCount; i++) {
+                currentTotal += selectedThrows[i];
+            }
+            int newScore = currentPlayer.getScore() - currentTotal;
+            playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
+            updateInputViews();
             
-            // Update UI
+            System.out.println("Undid throw from current turn - throws remaining: " + throwCount);
+        }
+        // If no throws in current turn, try to undo from previous turn
+        else if (lastPlayerIndex != -1 && lastScore != -1) {
+            currentPlayerIndex = lastPlayerIndex;
+            Player previousPlayer = selectedPlayers.get(currentPlayerIndex);
+            previousPlayer.setScore(lastScore);
+            playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(lastScore));
+            selectedThrows = lastThrows.clone();
+            throwCount = 3;
             updateCurrentPlayerUI();
-            
-            System.out.println("Undid last turn for " + playerToRestore.getName() + " - Score restored to " + lastScore);
-            
-            // Clear undo data so it can only be used once
+            updateInputViews();
+            throwCount--;
+            selectedThrows[throwCount] = 0;
+            int currentTotal = 0;
+            for (int i = 0; i < throwCount; i++) {
+                currentTotal += selectedThrows[i];
+            }
+            int newScore = previousPlayer.getScore() - currentTotal;
+            playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
+            updateInputViews();
             lastPlayerIndex = -1;
             lastScore = -1;
             lastThrows = new int[3];
@@ -426,5 +408,40 @@ public class GameView extends AppCompatActivity {
         inputView3.setText("");
     }
 
+    private void finishGame(Player currentPlayer) {
+        System.out.println("Player " + currentPlayer.getName() + " wins!");
+        Game game = new Game(GameId,
+                selectedPlayers.get(0).getName(),
+                selectedPlayers.get(1).getName(),
+                currentPlayer.getName(),
+                player1throws,
+                player2throws,
+                selectedPlayers.get(0).getScore(),
+                selectedPlayers.get(1).getScore(),
+                "501");
+        game.setWinnerName(currentPlayer.getName());
+        GameId = gameStorage.getNextGameId();
+        gameStorage.addGame(game);
+        // Handle winner logic here - for now, just continue the game
+        Intent intent = new Intent(this, EndViewActivity.class);
+        startActivity(intent);
+    }
+
+    private void bustTurn() {
+        Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
+        currentPlayer.setScore(lastScore);
+        playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(lastScore));
+        selectedThrows = new int[3];
+        throwCount = 0;
+        clearInputViews();
+    }
+
+    private void moveToNextPlayer() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % selectedPlayers.size();
+        throwCount = 0;
+        selectedThrows = new int[3];
+        updateCurrentPlayerUI();
+        clearInputViews();
+    }
 
 }
