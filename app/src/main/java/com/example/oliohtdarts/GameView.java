@@ -271,17 +271,19 @@ public class GameView extends AppCompatActivity {
 
             // Calculate and display the potential newScore using setCurrentScore
             int newScore = setCurrentScore();
-
-            if (newScore >= 0 && newScore != 1) {
+            if (newScore == 0 && nextMultiplier == 2) {
+                finishGame(currentPlayer);
+                return; // Exit early if game is finished
+            } else if (newScore > 1) {
                 currentPlayer.setScore(newScore);
-                if (newScore == 0 && nextMultiplier == 2) {
-                    finishGame(currentPlayer);
-                    return; // Exit early if game is finished
-                }
             } else {
                 bustTurn();
                 return; // Exit early if bust
             }
+            
+            // Reset multiplier after the final throw
+            nextMultiplier = 1;
+            resetMultiplierButtons();
             updateInputViews();
             moveToNextPlayer();
         }
@@ -424,6 +426,10 @@ public class GameView extends AppCompatActivity {
         
         selectedThrows = new int[3];
         throwCount = 0;
+        
+        // Reset multiplier buttons after bust
+        nextMultiplier = 1;
+        resetMultiplierButtons();
     }
 
     private void moveToNextPlayer() {
