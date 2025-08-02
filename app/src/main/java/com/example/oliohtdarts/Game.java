@@ -15,7 +15,6 @@ public class Game implements Serializable {
     private int player1score;
     private int player2score;
     private String gameType; //"301", "501", "701", etc.
-
     private String timeAndDate;
 
     public Game(int gameId, String player1, String player2, String winnerName, int player1throws, int player2throws, int player1score, int player2score, String gameType) {

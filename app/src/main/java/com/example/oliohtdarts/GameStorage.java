@@ -74,4 +74,8 @@ public class GameStorage {
             System.out.println("Virhe pelaajien lataamisessa: " + e.getMessage());
         }
     }
+    public void clearGames() {
+        games.clear();
+        gameIdCounter = 0;
+    }
 }

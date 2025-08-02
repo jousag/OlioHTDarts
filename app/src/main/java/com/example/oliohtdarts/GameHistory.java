@@ -53,4 +53,8 @@ public class GameHistory extends AppCompatActivity {
         super.onPause();
         gameStorage.saveGames(this); // Save games to storage when the activity is paused
     }
+    public void clearGameHistory(View view) {
+        gameStorage.clearGames();
+        recyclerView.setAdapter(new GameListAdapter(getApplicationContext(), gameStorage.getAllGames()));
+    }
 }

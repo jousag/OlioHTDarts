@@ -97,13 +97,13 @@ public class EndViewActivity extends AppCompatActivity {
             player1.setScore(lastGame.getPlayer1score());
             player1.setDartsThrown(lastGame.getPlayer1throws() + player1.getDartsThrown());
             player1.setPlayedGames(player1.getPlayedGames() + 1);
-            player1.setThreeDartAverage(lastGame.getPlayer1score() / (float) lastGame.getPlayer1throws());
+            player1.setThreeDartAverage((501 - lastGame.getPlayer1score()) / (float) lastGame.getPlayer1throws() / 3);
         }
         if (player2 != null) {
             player2.setScore(lastGame.getPlayer2score());
             player2.setDartsThrown(lastGame.getPlayer2throws() + player2.getDartsThrown());
             player2.setPlayedGames(player2.getPlayedGames() + 1);
-            player2.setThreeDartAverage(lastGame.getPlayer2score()/ (float) lastGame.getPlayer2throws());
+            player2.setThreeDartAverage((501 - lastGame.getPlayer2score())/ (float) (lastGame.getPlayer2throws() / 3));
         }
     PlayerStorage.getInstance().savePlayers(this);
     }
