@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,23 +55,28 @@ public class NewMatchActivity extends AppCompatActivity {
         } // Update the RecyclerView adapter with the latest player data
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        for (Player player : PlayerStorage.getInstance().getPlayers()) {
-            player.setSelected(false); // Reset selection state when the activity is paused
-        }
-        PlayerStorage.getInstance().savePlayers(this);
-        // Save players to storage when the activity is paused
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        for (Player player : PlayerStorage.getInstance().getPlayers()) {
+//            player.setSelected(false);
+//        }
+//        PlayerStorage.getInstance().savePlayers(this);
+//    }
 
 
     public void switchToMain(View view) {
+        playerStorage.clearSelectedPlayers();
+        updateSelectedPlayersText(new ArrayList<>());
+        playerStorage.savePlayers(this);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
     public void switchToAddPlayer(View view) {
+        playerStorage.clearSelectedPlayers();
+        updateSelectedPlayersText(new ArrayList<>());
+        playerStorage.savePlayers(this);
         Intent intent = new Intent(this, AddPlayerActivity.class);
         startActivity(intent);
     }
@@ -93,7 +99,11 @@ public class NewMatchActivity extends AppCompatActivity {
     }
 
     public void switchToMatch(View view) {
-        Intent intent = new Intent(this, GameView.class);
-        startActivity(intent);
+        if (playerStorage.getSelectedPlayers().size() == 2) {
+            Intent intent = new Intent(this, GameView.class);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Please select exactly two players to start a match!", Toast.LENGTH_LONG).show();
+        }
     }
 }

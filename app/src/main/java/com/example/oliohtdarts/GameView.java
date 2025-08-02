@@ -151,6 +151,9 @@ public class GameView extends AppCompatActivity {
         
         // Set up button click listeners
         setupButtonListeners();
+
+        // clear selected players in PlayerStorage
+        playerStorage.clearSelectedPlayers();
     }
     
     private void setupButtonListeners() {
@@ -234,10 +237,6 @@ public class GameView extends AppCompatActivity {
 
 
     private void handleScoreInput(int value) {
-        // Check if we have selected players
-        if (selectedPlayers.isEmpty()) {
-            return;
-        }
         if (throwCount == 0) {
             clearInputViews();
         }

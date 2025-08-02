@@ -28,8 +28,6 @@ public class PlayerStorage {
         }
         return playerStorage;
     }
-
-
     public ArrayList<Player> getPlayers() {
         return players;
     }
@@ -113,4 +111,10 @@ public class PlayerStorage {
         }
         return selectedPlayers;
     }
+    public void clearSelectedPlayers() {
+        for (Player player : PlayerStorage.getInstance().getPlayers()) {
+            player.setSelected(false);
+        }
+    }
+    private Context getContext() {return null;}
 }
