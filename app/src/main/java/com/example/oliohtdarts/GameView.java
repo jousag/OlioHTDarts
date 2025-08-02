@@ -21,19 +21,12 @@ public class GameView extends AppCompatActivity {
     
     private int throwCount = 0;
     private int[] selectedThrows = new int[3];
-    private int startScore = 501;
     private int currentPlayerIndex = 0;
     private int nextMultiplier = 1; // For double/triple functionality
-    private int lastPlayerIndex = -1; // For undo functionality
-    private int[] lastThrows = new int[3]; // For undo functionality
-    private int lastScore = -1; // For undo functionality
-    
-    // Global throw history for undo functionality
     private ArrayList<ThrowData> throwHistory = new ArrayList<>();
     private int GameId = 0; // Game ID for tracking games
     private int player1throws = 0;
     private int player2throws = 0;
-    private EditText scoreEditText;
     private TextView player1Name;
     private TextView player2Name;
     private TextView player1Score;
@@ -251,11 +244,6 @@ public class GameView extends AppCompatActivity {
             return;
         }
         if (throwCount == 0) {
-            // Save state at the beginning of each turn for undo functionality
-            lastPlayerIndex = currentPlayerIndex;
-            Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
-            lastScore = currentPlayer.getScore();
-            lastThrows = selectedThrows.clone();
             clearInputViews();
         }
         if (throwCount < 3) {
@@ -419,13 +407,27 @@ public class GameView extends AppCompatActivity {
 
     private void bustTurn() {
         Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
-        currentPlayer.setScore(lastScore);
-        playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(lastScore));
+        
+        // Find the player's score before this turn started by looking at throw history
+        int scoreBeforeTurn = currentPlayer.getScore();
+        if (!throwHistory.isEmpty()) {
+            // Look for the first throw of this turn to get the score before it
+            for (int i = throwHistory.size() - 1; i >= 0; i--) {
+                ThrowData throwData = throwHistory.get(i);
+                if (throwData.playerIndex == currentPlayerIndex && throwData.throwIndexInTurn == 0) {
+                    scoreBeforeTurn = throwData.playerScoreBefore;
+                    break;
+                }
+            }
+        }
+        
+        currentPlayer.setScore(scoreBeforeTurn);
+        playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(scoreBeforeTurn));
         
         // Remove the throws from this busted turn from history
         while (!throwHistory.isEmpty()) {
             ThrowData lastThrow = throwHistory.get(throwHistory.size() - 1);
-            if (lastThrow.playerIndex == currentPlayerIndex && lastThrow.playerScoreBefore == lastScore) {
+            if (lastThrow.playerIndex == currentPlayerIndex && lastThrow.playerScoreBefore == scoreBeforeTurn) {
                 throwHistory.remove(throwHistory.size() - 1);
             } else {
                 break;
