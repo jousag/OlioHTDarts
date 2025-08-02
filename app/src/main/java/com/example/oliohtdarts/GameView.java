@@ -420,10 +420,14 @@ public class GameView extends AppCompatActivity {
                 selectedPlayers.get(0).getScore(),
                 selectedPlayers.get(1).getScore(),
                 "501");
-        game.setWinnerName(currentPlayer.getName());
         GameId = gameStorage.getNextGameId();
+        game.setWinnerName(currentPlayer.getName());
+        game.setPlayer1throws(player1throws);
+        game.setPlayer2throws(player2throws);
+        game.setPlayer1(selectedPlayers.get(0).getName());
+        game.setPlayer2(selectedPlayers.get(1).getName());
+        game.setGameId(GameId);
         gameStorage.addGame(game);
-        // Handle winner logic here - for now, just continue the game
         Intent intent = new Intent(this, EndViewActivity.class);
         startActivity(intent);
     }
@@ -448,6 +452,11 @@ public class GameView extends AppCompatActivity {
     }
 
     private void moveToNextPlayer() {
+            if (currentPlayerIndex == 0) {
+                player1throws += throwCount;
+            } else if (currentPlayerIndex == 1) {
+                player2throws += throwCount;
+            }
         currentPlayerIndex = (currentPlayerIndex + 1) % selectedPlayers.size();
         throwCount = 0;
         selectedThrows = new int[3];

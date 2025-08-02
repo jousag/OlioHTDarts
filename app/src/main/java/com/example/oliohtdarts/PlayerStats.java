@@ -91,8 +91,6 @@ public class PlayerStats extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Player not found!", Toast.LENGTH_SHORT).show();
             }
-
-
         }
         PlayerStorage.getInstance().savePlayers(this);
         // Save players to storage when the activity is paused

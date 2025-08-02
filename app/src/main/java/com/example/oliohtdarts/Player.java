@@ -39,16 +39,13 @@ public class Player implements Serializable {
     public float getThreeDartAverage() {
         return ThreeDartAverage;
     }
-    public boolean isSelected() {
-        return isSelected;
-    }
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-    }
+    public boolean isSelected() {return isSelected;}
+    public void setSelected(boolean selected) {isSelected = selected;}
     public int getImage() {return image;}
-
     public int getHighScore() {return highScore;}
-
     public int getDartsThrown() {return DartsThrown;}
+    public void setDartsThrown(int dartsThrown) {DartsThrown = dartsThrown;}
+    public void setPlayedGames(int playedGames) {this.playedGames = playedGames;}
+    public void setThreeDartAverage (float threeDartAverage) {ThreeDartAverage = threeDartAverage;}
 
 }

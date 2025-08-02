@@ -1,6 +1,11 @@
 package com.example.oliohtdarts;
 
-public class Game {
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
+public class Game implements Serializable {
     private int gameId;
     private String player1;
     private String player2;
@@ -10,6 +15,8 @@ public class Game {
     private int player1score;
     private int player2score;
     private String gameType; //"301", "501", "701", etc.
+
+    private String timeAndDate;
 
     public Game(int gameId, String player1, String player2, String winnerName, int player1throws, int player2throws, int player1score, int player2score, String gameType) {
         this.gameId = gameId;
@@ -21,6 +28,7 @@ public class Game {
         this.player1score = player1score;
         this.player2score = player2score;
         this.gameType = gameType;
+        this.timeAndDate = new SimpleDateFormat( "HH:mm dd.MM.yyyy", Locale.getDefault()).format(Calendar.getInstance().getTime());
     }
     public int getGameId() {
         return gameId;
@@ -51,7 +59,7 @@ public class Game {
     public String getGameType() {
         return gameType;
     }
-    public void setGameId(int id) {
+    public void setGameId(int gameId) {
         this.gameId = gameId;
     }
     public void setPlayer1(String player1) {
@@ -78,4 +86,5 @@ public class Game {
     public void setGameType(String gameType) {
         this.gameType = gameType;
     }
+    public String getTimeAndDate() { return timeAndDate;}
 }

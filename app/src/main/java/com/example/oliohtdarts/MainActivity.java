@@ -31,5 +31,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, PlayerListActivity.class));
     }
 
+    public void switchToGameHistory(View view) {
+        startActivity(new Intent(this, GameHistory.class));
+    }
+
 
 }

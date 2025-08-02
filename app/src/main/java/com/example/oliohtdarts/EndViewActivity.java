@@ -26,11 +26,8 @@ public class EndViewActivity extends AppCompatActivity {
             Color.YELLOW,
             Color.RED // Loop back to red
     };
-
     private GameStorage gameStorage;
-
     TextView winnerNameTextView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +40,8 @@ public class EndViewActivity extends AppCompatActivity {
             winnerNameTextView = findViewById(R.id.textWinnerName);
             winnerNameTextView.setText(gameStorage.getAllGames().get(gameStorage.getAllGames().size() - 1).getWinnerName());
 
+            GameStorage.getInstance().saveGames(this); // Save the game data
+            updatePlayerData();
             animateSmoothRainbow(winnerNameTextView);
             return insets;
         });
@@ -87,5 +86,25 @@ public class EndViewActivity extends AppCompatActivity {
         float g = Color.green(color1) * inverseRatio + Color.green(color2) * ratio;
         float b = Color.blue(color1) * inverseRatio + Color.blue(color2) * ratio;
         return Color.rgb((int) r, (int) g, (int) b);
+    }
+
+    private void updatePlayerData(){
+        Game lastGame = gameStorage.getAllGames().get(gameStorage.getAllGames().size() - 1);
+        Player player1 = PlayerStorage.getInstance().getPlayerByName(lastGame.getPlayer1());
+        Player player2 = PlayerStorage.getInstance().getPlayerByName(lastGame.getPlayer2());
+
+        if (player1 != null) {
+            player1.setScore(lastGame.getPlayer1score());
+            player1.setDartsThrown(lastGame.getPlayer1throws() + player1.getDartsThrown());
+            player1.setPlayedGames(player1.getPlayedGames() + 1);
+            player1.setThreeDartAverage(lastGame.getPlayer1score() / (float) lastGame.getPlayer1throws());
+        }
+        if (player2 != null) {
+            player2.setScore(lastGame.getPlayer2score());
+            player2.setDartsThrown(lastGame.getPlayer2throws() + player2.getDartsThrown());
+            player2.setPlayedGames(player2.getPlayedGames() + 1);
+            player2.setThreeDartAverage(lastGame.getPlayer2score()/ (float) lastGame.getPlayer2throws());
+        }
+    PlayerStorage.getInstance().savePlayers(this);
     }
 }
