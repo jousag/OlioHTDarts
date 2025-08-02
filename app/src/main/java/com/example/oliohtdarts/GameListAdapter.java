@@ -32,6 +32,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameViewHolder> {
         holder.gameId.setText(String.valueOf(games.get(position).getGameId()));
         holder.winnerName.setText(games.get(position).getWinnerName());
         holder.gameTimeAndDate.setText(games.get(position).getTimeAndDate());
+        holder.loserName.setText(games.get(position).getLoserName());
     }
 
     @Override

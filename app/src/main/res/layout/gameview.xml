@@ -7,27 +7,35 @@
         android:layout_width="match_parent"
         android:layout_height="25dp"
         android:layout_marginTop="2dp"
-        android:background="#2196F3"
+        android:background="#FFC107"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/textGameID"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:gravity="center|top"
             android:text="GameID" />
 
         <TextView
             android:id="@+id/textListWinnerName"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Winner Name" />
 
         <TextView
-            android:id="@+id/textGameTimeAndDate"
+            android:id="@+id/textListLoserName"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Loser Name" />
+
+        <TextView
+            android:id="@+id/textGameTimeAndDate"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="TimeAndDate" />
     </LinearLayout>

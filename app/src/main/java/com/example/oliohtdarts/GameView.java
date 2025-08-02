@@ -25,6 +25,7 @@ public class GameView extends AppCompatActivity {
     private int GameId = 0;
     private int player1throws = 0;
     private int player2throws = 0;
+    private String loserName = "";
     private TextView player1Name;
     private TextView player2Name;
     private TextView player1Score;
@@ -373,11 +374,18 @@ public class GameView extends AppCompatActivity {
     }
 
     private void finishGame(Player currentPlayer) {
-        System.out.println("Player " + currentPlayer.getName() + " wins!");
-        Game game = new Game(GameId,
+        if (currentPlayer == selectedPlayers.get(0)) {
+            loserName = selectedPlayers.get(1).getName();
+        } else {
+            loserName = selectedPlayers.get(0).getName();
+        }
+        System.out.println("Game finished! Winner: " + currentPlayer.getName() + ", Loser: " + loserName);
+        Game game = new Game(
+                GameId,
                 selectedPlayers.get(0).getName(),
                 selectedPlayers.get(1).getName(),
                 currentPlayer.getName(),
+                loserName,
                 player1throws,
                 player2throws,
                 selectedPlayers.get(0).getScore(),
@@ -385,6 +393,7 @@ public class GameView extends AppCompatActivity {
                 "501");
         GameId = gameStorage.getNextGameId();
         game.setWinnerName(currentPlayer.getName());
+        game.setLoserName(loserName);
         game.setPlayer1throws(player1throws);
         game.setPlayer2throws(player2throws);
         game.setPlayer1(selectedPlayers.get(0).getName());

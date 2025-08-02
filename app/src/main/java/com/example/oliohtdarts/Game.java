@@ -10,6 +10,7 @@ public class Game implements Serializable {
     private String player1;
     private String player2;
     private String winnerName;
+    private String loserName;
     private int player1throws;
     private int player2throws;
     private int player1score;
@@ -17,11 +18,12 @@ public class Game implements Serializable {
     private String gameType; //"301", "501", "701", etc.
     private String timeAndDate;
 
-    public Game(int gameId, String player1, String player2, String winnerName, int player1throws, int player2throws, int player1score, int player2score, String gameType) {
+    public Game(int gameId, String player1, String player2, String winnerName, String loserName, int player1throws, int player2throws, int player1score, int player2score, String gameType) {
         this.gameId = gameId;
         this.player1 = player1;
         this.player2 = player2;
         this.winnerName = winnerName;
+        this.loserName = loserName;
         this.player1throws = player1throws;
         this.player2throws = player2throws;
         this.player1score = player1score;
@@ -39,6 +41,7 @@ public class Game implements Serializable {
         return player2;
     }
     public String getWinnerName() {return winnerName;}
+    public String getLoserName() {return loserName;}
     public int getPlayer1throws() {
         return player1throws;
     }
@@ -69,6 +72,9 @@ public class Game implements Serializable {
     }
     public void setWinnerName(String winnerName) {
         this.winnerName = winnerName;
+    }
+    public void setLoserName(String loserName) {
+        this.loserName = loserName;
     }
     public void setPlayer1throws(int player1throws) {
         this.player1throws = player1throws;

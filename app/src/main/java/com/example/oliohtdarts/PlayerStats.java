@@ -1,5 +1,6 @@
 package com.example.oliohtdarts;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -32,6 +33,7 @@ public class PlayerStats extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.player1score), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            System.out.println("Selected players: " + PlayerStorage.getInstance().getSelectedPlayers().size());
             playerName = findViewById(R.id.txtPlayerName);
             player3DartAverage = findViewById(R.id.textPlayerThreeDartAVG);
             playerGamesPlayed = findViewById(R.id.textPlayerGamesPlayed);
@@ -39,13 +41,10 @@ public class PlayerStats extends AppCompatActivity {
             playerDartsThrown = findViewById(R.id.textPlayerDartsThrown);
             playerStorage = PlayerStorage.getInstance();
             playerImage = findViewById(R.id.imageView);
-            System.out.println("Player stats created");
             updatePlayerStats(playerStorage.getSelectedPlayers());
             return insets;
         });
     }
-
-
     public void updatePlayerStats(List<String> selectedPlayers) {;
 
         if (selectedPlayers.isEmpty()) {
@@ -57,12 +56,12 @@ public class PlayerStats extends AppCompatActivity {
             Player player = playerStorage.getPlayerByName(playerNameText);
             if (player != null) {
                 playerName.setText(playerNameText);
-                // Set the player's image, assuming you have a method to get the image resource
+                String ThreedartAverage = String.format("%.2f", player.getThreeDartAverage());
                 playerImage.setImageResource(player.getImage());
-                player3DartAverage.setText("3 Dart Average: " + player.getThreeDartAverage());
-                playerGamesPlayed.setText("Games Played: " + player.getPlayedGames());
-                playerCheckout.setText("Biggest Checkout: " + player.getHighScore());
-                playerDartsThrown.setText("Darts Thrown: " + player.getDartsThrown());
+                player3DartAverage.setText(ThreedartAverage);
+                playerGamesPlayed.setText(String.valueOf(player.getPlayedGames()));
+                playerCheckout.setText(String.valueOf(player.getHighScore()));
+                playerDartsThrown.setText(String.valueOf(player.getDartsThrown()));
             } else {
                 playerName.setText("Player not found");
                 playerImage.setImageResource(R.drawable.dartsimage);

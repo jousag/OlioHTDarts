@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Nimi"
+            android:textColorLink="#050000"
             android:textSize="20sp" />
 
         <TextView
@@ -24,14 +25,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="pelatut pelit" />
+            android:text="pelatut pelit"
+            android:textColorLink="#050000" />
 
         <TextView
             android:id="@+id/txtThreeDartAVG"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="3Dart-AVG" />
+            android:text="3Dart-AVG"
+            android:textColorLink="#050000" />
     </LinearLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>
 
