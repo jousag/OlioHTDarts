@@ -19,21 +19,6 @@ import java.util.ArrayList;
 
 public class GameView extends AppCompatActivity {
     
-    // Helper class to store throw data for undo functionality
-    private static class ThrowData {
-        int playerIndex;
-        int throwValue;
-        int playerScoreBefore;
-        int throwIndexInTurn;
-        
-        ThrowData(int playerIndex, int throwValue, int playerScoreBefore, int throwIndexInTurn) {
-            this.playerIndex = playerIndex;
-            this.throwValue = throwValue;
-            this.playerScoreBefore = playerScoreBefore;
-            this.throwIndexInTurn = throwIndexInTurn;
-        }
-    }
-    
     private int throwCount = 0;
     private int[] selectedThrows = new int[3];
     private int startScore = 501;
