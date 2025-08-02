@@ -1,12 +1,10 @@
 package com.example.oliohtdarts;
 
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -22,9 +20,9 @@ public class GameView extends AppCompatActivity {
     private int throwCount = 0;
     private int[] selectedThrows = new int[3];
     private int currentPlayerIndex = 0;
-    private int nextMultiplier = 1; // For double/triple functionality
+    private int nextMultiplier = 1;
     private ArrayList<ThrowData> throwHistory = new ArrayList<>();
-    private int GameId = 0; // Game ID for tracking games
+    private int GameId = 0;
     private int player1throws = 0;
     private int player2throws = 0;
     private TextView player1Name;
@@ -110,12 +108,10 @@ public class GameView extends AppCompatActivity {
         inputView3 = findViewById(R.id.inputView3);
 
         PlayerStorage playerStorage = PlayerStorage.getInstance();
-        //GameStorage gameStorage = GameStorage.getInstance();
         selectedPlayers = playerStorage.getSelected();
         
         // Initialize all selected players if none are selected (for testing)
         if (selectedPlayers.isEmpty()) {
-            // Add some sample selected players for testing
             ArrayList<Player> allPlayers = playerStorage.getPlayers();
             if (!allPlayers.isEmpty()) {
                 for (int i = 0; i < Math.min(2, allPlayers.size()); i++) {
@@ -125,7 +121,6 @@ public class GameView extends AppCompatActivity {
                 selectedPlayers = playerStorage.getSelected();
             }
         } else {
-            // Reset scores for selected players to 501
             for (Player player : selectedPlayers) {
                 player.resetScore();
             }
@@ -329,24 +324,18 @@ public class GameView extends AppCompatActivity {
         
         // Switch to the player who made that throw
         currentPlayerIndex = lastThrow.playerIndex;
-        
-        // Rebuild the current turn state based on remaining throws for this player
         selectedThrows = new int[3];
         throwCount = 0;
-        
-        // Look for any remaining throws in this turn after the undo
         for (int i = throwHistory.size() - 1; i >= 0; i--) {
             ThrowData throwData = throwHistory.get(i);
             if (throwData.playerIndex == currentPlayerIndex && throwData.throwIndexInTurn < 3) {
-                // Found a throw from current player in current turn
                 selectedThrows[throwData.throwIndexInTurn] = throwData.throwValue;
                 throwCount = Math.max(throwCount, throwData.throwIndexInTurn + 1);
             } else {
-                break; // Different player or different turn
+                break;
             }
         }
-        
-        // Recalculate and update the current player's score display based on remaining throws
+        // Reset the current score display
         setCurrentScore();
         
         // Update UI
