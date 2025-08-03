@@ -227,17 +227,16 @@ public class GameView extends AppCompatActivity {
         } else if (buttonName.equals("button50")) {
             return 50;
         } else if (buttonName.startsWith("button")) {
-            // Extract number from button name (e.g., "button1" -> 1)
-            String numberStr = buttonName.substring(6); // Remove "button" prefix
+            String numberStr = buttonName.substring(6);
             try {
 
                 return Integer.parseInt(numberStr);
             } catch (NumberFormatException e) {
-                return 0; // Default to 0 if parsing fails
+                return 0;
             }
         }
         
-        return 0; // Default value
+        return 0;
     }
     // This method updates the UI to reflect the current player's turn
     private void updateCurrentPlayerUI() {
