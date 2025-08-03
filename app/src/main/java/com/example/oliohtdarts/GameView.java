@@ -278,21 +278,21 @@ public class GameView extends AppCompatActivity {
                 bustTurn();
                 moveToNextPlayer();
                 return; // Exit early if bust
-            }
-            if (newScore == 0 && nextMultiplier == 2) {
+            } else if (newScore == 0 && nextMultiplier == 2 || (newScore == 0 && value == 50)) {
                 finishGame(currentPlayer);
                 return; // Exit early if game is finished
-            }
+            } else {
             // Reset multiplier after each throw
             nextMultiplier = 1;
             resetMultiplierButtons();
             updateInputViews();
+            }
         }        
 
         if (throwCount == 3) {
             Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
             int newScore = setCurrentScore();
-            if (newScore == 0 && nextMultiplier == 2) {
+            if (newScore == 0 && nextMultiplier == 2 || (newScore == 0 && value == 50)) {
                 finishGame(currentPlayer);
                 return; // Exit early if game is finished
             } else if (newScore > 1) {
@@ -335,8 +335,8 @@ public class GameView extends AppCompatActivity {
         ThrowData lastThrow = throwHistory.get(throwHistory.size() - 1);
         throwHistory.remove(throwHistory.size() - 1);
         Player playerToRestore = selectedPlayers.get(lastThrow.playerIndex);
-        playerToRestore.setScore(lastThrow.playerScoreBefore);
-        playerScoreViews.get(lastThrow.playerIndex).setText(String.valueOf(lastThrow.playerScoreBefore));
+        playerToRestore.setScore(ThrowData.playerScoreBefore);
+        playerScoreViews.get(lastThrow.playerIndex).setText(String.valueOf(ThrowData.playerScoreBefore));
         
         // Switch to the player who made that throw
         currentPlayerIndex = lastThrow.playerIndex;
@@ -396,6 +396,15 @@ public class GameView extends AppCompatActivity {
         } else {
             loserName = selectedPlayers.get(0).getName();
         }
+        
+        // Calculate the checkout value (score before the winning turn)
+        int checkoutValue = getScoreBeforeTurn();
+        
+        // Update highest checkout if this checkout is higher
+        if (checkoutValue > currentPlayer.getHighestCheckout()) {
+            currentPlayer.setHighestCheckout(checkoutValue);
+        }
+        
         Game game = new Game(
                 GameId,
                 selectedPlayers.get(0).getName(),
@@ -428,7 +437,7 @@ public class GameView extends AppCompatActivity {
             for (int i = throwHistory.size() - 1; i >= 0; i--) {
                 ThrowData throwData = throwHistory.get(i);
                 if (throwData.playerIndex == currentPlayerIndex && throwData.throwIndexInTurn == 0) {
-                    scoreBeforeTurn = throwData.playerScoreBefore;
+                    scoreBeforeTurn = ThrowData.playerScoreBefore;
                     break;
                 }
             }
@@ -447,7 +456,7 @@ public class GameView extends AppCompatActivity {
         // Remove the throws from this busted turn from history
         while (!throwHistory.isEmpty()) {
             ThrowData lastThrow = throwHistory.get(throwHistory.size() - 1);
-            if (lastThrow.playerIndex == currentPlayerIndex && lastThrow.playerScoreBefore == scoreBeforeTurn) {
+            if (lastThrow.playerIndex == currentPlayerIndex && ThrowData.playerScoreBefore == scoreBeforeTurn) {
                 throwHistory.remove(throwHistory.size() - 1);
             } else {
                 break;
@@ -461,11 +470,7 @@ public class GameView extends AppCompatActivity {
     }
 
     private void moveToNextPlayer() {
-            if (currentPlayerIndex == 0) {
-                player1throws += throwCount;
-            } else if (currentPlayerIndex == 1) {
-                player2throws += throwCount;
-            }
+        throwCounter();
         currentPlayerIndex = (currentPlayerIndex + 1) % selectedPlayers.size();
         throwCount = 0;
         selectedThrows = new int[3];

@@ -7,11 +7,12 @@ public class Player implements Serializable {
     private int score;
     private int highScore;
     private int playedGames;
-    private float ThreeDartAverage;
-    private int LastThreeDartScore;
+    private float threeDartAverage;
     private int DartsThrown;
     private boolean isSelected;
     private int image;
+
+    private int highestCheckout;
 
     public Player(String name) {
         this.name = name;
@@ -35,7 +36,7 @@ public class Player implements Serializable {
         return playedGames;
     }
     public float getThreeDartAverage() {
-        return ThreeDartAverage;
+        return threeDartAverage;
     }
     // setters
     public void setScore(int score) {
@@ -44,10 +45,18 @@ public class Player implements Serializable {
     public void resetScore() {
         this.score = 501; // Reset score to default starting value
     }
-    public boolean isSelected() {return isSelected;}
     public void setSelected(boolean selected) {isSelected = selected;}
     public void setDartsThrown(int dartsThrown) {DartsThrown = dartsThrown;}
     public void setPlayedGames(int playedGames) {this.playedGames = playedGames;}
-    public void setThreeDartAverage (float threeDartAverage) {ThreeDartAverage = threeDartAverage;}
+    public void setThreeDartAverage (float threeDartAverage) {threeDartAverage = threeDartAverage;}
+
+    public void setHighestCheckout(int highestCheckout) {
+        this.highestCheckout = highestCheckout;
+    }
+    public int getHighestCheckout(){
+        return highestCheckout;
+    }
+
+    public boolean isSelected() {return isSelected;}
 
 }

@@ -58,7 +58,7 @@ public class PlayerStats extends AppCompatActivity {
                 playerImage.setImageResource(player.getImage());
                 player3DartAverage.setText(ThreedartAverage);
                 playerGamesPlayed.setText(String.valueOf(player.getPlayedGames()));
-                playerCheckout.setText(String.valueOf(player.getHighScore()));
+                playerCheckout.setText(String.valueOf(player.getHighestCheckout()));
                 playerDartsThrown.setText(String.valueOf(player.getDartsThrown()));
             } else {
                 playerName.setText("Player not found");
