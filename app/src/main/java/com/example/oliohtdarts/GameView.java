@@ -1,6 +1,7 @@
 package com.example.oliohtdarts;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +14,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GameView extends AppCompatActivity {
     
@@ -21,15 +31,13 @@ public class GameView extends AppCompatActivity {
     private int[] selectedThrows = new int[3];
     private int currentPlayerIndex = 0;
     private int nextMultiplier = 1;
-    private ArrayList<ThrowData> throwHistory = new ArrayList<>();
+    private final ArrayList<ThrowData> throwHistory = new ArrayList<>();
     private int GameId = 0;
     private int player1throws = 0;
     private int player2throws = 0;
-    private String loserName = "";
     private TextView player1Name;
     private TextView player2Name;
-    private TextView player1Score;
-    private TextView player2Score;
+    private TextView checkoutView;
     private Button buttonDouble;
     private Button buttonTriple;
     private Button buttonUndo;
@@ -48,11 +56,13 @@ public class GameView extends AppCompatActivity {
     private TextView inputView2;
     private TextView inputView3;
 
-    private ArrayList<TextView> playerScoreViews = new ArrayList<>();
+    private final ArrayList<TextView> playerScoreViews = new ArrayList<>();
     private ArrayList<Player> selectedPlayers = new ArrayList<>();
 
     private GameStorage gameStorage;
-
+    private final Map<String, String> checkoutCache = new HashMap<>();
+    private boolean checkoutDataLoaded = false;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 
     @Override
@@ -68,10 +78,11 @@ public class GameView extends AppCompatActivity {
         });
 
 
-        player1Score = findViewById(R.id.player1Score);
-        player2Score = findViewById(R.id.player2Score);
+        TextView player1Score = findViewById(R.id.player1Score);
+        TextView player2Score = findViewById(R.id.player2Score);
         player1Name = findViewById(R.id.player1Name);
         player2Name = findViewById(R.id.player2Name);
+        checkoutView = findViewById(R.id.checkoutView); // This might be null if not in layout
         // Special function buttons
         buttonDouble = findViewById(R.id.buttonDouble);
         buttonTriple = findViewById(R.id.buttonTriple);
@@ -128,7 +139,7 @@ public class GameView extends AppCompatActivity {
         }
 
         // Set up player names and scores
-        if (selectedPlayers.size() > 0) {
+        if (!selectedPlayers.isEmpty()) {
             player1Name.setText(selectedPlayers.get(0).getName());
             player1Score.setText(String.valueOf(selectedPlayers.get(0).getScore()));
             playerScoreViews.add(player1Score);
@@ -152,6 +163,9 @@ public class GameView extends AppCompatActivity {
         
         // Set up button click listeners
         setupButtonListeners();
+
+        // Load checkout data asynchronously
+        loadCheckoutData();
 
         // clear selected players in PlayerStorage
         playerStorage.clearSelectedPlayers();
@@ -252,6 +266,10 @@ public class GameView extends AppCompatActivity {
             throwCount++;
             
             int newScore = setCurrentScore();
+            
+            // Call viewCheckout with the new score
+            viewCheckout(newScore);
+            
             if (newScore == 1 || newScore < 0) {
                 bustTurn();
                 moveToNextPlayer();
@@ -269,8 +287,6 @@ public class GameView extends AppCompatActivity {
 
         if (throwCount == 3) {
             Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
-
-            // Calculate and display the potential newScore using setCurrentScore
             int newScore = setCurrentScore();
             if (newScore == 0 && nextMultiplier == 2) {
                 finishGame(currentPlayer);
@@ -281,8 +297,6 @@ public class GameView extends AppCompatActivity {
                 bustTurn();
                 return; // Exit early if bust
             }
-            
-            // Reset multiplier after the final throw
             nextMultiplier = 1;
             resetMultiplierButtons();
             updateInputViews();
@@ -314,12 +328,8 @@ public class GameView extends AppCompatActivity {
         if (throwHistory.isEmpty()) {
             return; // Nothing to undo
         }
-        
-        // Get the last throw from history
         ThrowData lastThrow = throwHistory.get(throwHistory.size() - 1);
-        throwHistory.remove(throwHistory.size() - 1); // Remove it from history
-        
-        // Restore the player's score to what it was before that throw
+        throwHistory.remove(throwHistory.size() - 1);
         Player playerToRestore = selectedPlayers.get(lastThrow.playerIndex);
         playerToRestore.setScore(lastThrow.playerScoreBefore);
         playerScoreViews.get(lastThrow.playerIndex).setText(String.valueOf(lastThrow.playerScoreBefore));
@@ -337,8 +347,10 @@ public class GameView extends AppCompatActivity {
                 break;
             }
         }
-        // Reset the current score display
-        setCurrentScore();
+        int currentScore = setCurrentScore();
+        if (!selectedPlayers.isEmpty() && currentPlayerIndex < selectedPlayers.size()) {
+            viewCheckout(currentScore);
+        }
         
         // Update UI
         clearInputViews();
@@ -374,6 +386,7 @@ public class GameView extends AppCompatActivity {
     }
 
     private void finishGame(Player currentPlayer) {
+        String loserName;
         if (currentPlayer == selectedPlayers.get(0)) {
             loserName = selectedPlayers.get(1).getName();
         } else {
@@ -404,10 +417,8 @@ public class GameView extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void bustTurn() {
+    private int getScoreBeforeTurn() {
         Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
-        
-        // Find the player's score before this turn started by looking at throw history
         int scoreBeforeTurn = currentPlayer.getScore();
         if (!throwHistory.isEmpty()) {
             // Look for the first throw of this turn to get the score before it
@@ -419,6 +430,13 @@ public class GameView extends AppCompatActivity {
                 }
             }
         }
+        return scoreBeforeTurn;
+    }
+
+    private void bustTurn() {
+        Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
+        
+        int scoreBeforeTurn = getScoreBeforeTurn();
         
         currentPlayer.setScore(scoreBeforeTurn);
         playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(scoreBeforeTurn));
@@ -450,7 +468,9 @@ public class GameView extends AppCompatActivity {
         currentPlayerIndex = (currentPlayerIndex + 1) % selectedPlayers.size();
         throwCount = 0;
         selectedThrows = new int[3];
-        updateCurrentPlayerUI();
+        updateCurrentPlayerUI();    
+        Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
+        viewCheckout(currentPlayer.getScore());
     }
 
     private int setCurrentScore() {
@@ -470,6 +490,46 @@ public class GameView extends AppCompatActivity {
             return newScore;
         }
         return -1; // Return -1 if no valid player
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void viewCheckout(int newScore) {
+        if (checkoutDataLoaded && checkoutCache.containsKey(String.valueOf(newScore))) {
+            String checkout = checkoutCache.get(String.valueOf(newScore));
+            if (checkoutView != null) {
+                checkoutView.setText(checkout);
+            }
+        } else if (checkoutDataLoaded) {
+            if (checkoutView != null) {
+                checkoutView.setText(getString(R.string.checkout_no_checkout));
+            }
+        }
+    }
+
+    private void loadCheckoutData() {
+        executorService.execute(() -> {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode checkoutData = objectMapper.readTree(new URL("https://mocki.io/v1/b33ccff8-afc8-4185-a1dd-37484cc1f180"));
+                checkoutCache.clear();
+                checkoutData.fieldNames().forEachRemaining(fieldName ->
+                        checkoutCache.put(fieldName, checkoutData.get(fieldName).asText())
+                );
+                checkoutDataLoaded = true;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+    
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (executorService != null) {
+            executorService.shutdown();
+        }
     }
 
 }
