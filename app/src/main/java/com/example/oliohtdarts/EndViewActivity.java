@@ -46,7 +46,7 @@ public class EndViewActivity extends AppCompatActivity {
     }
     public void switchToNewMatch(View view) {
         PlayerStorage.getInstance().clearSelectedPlayers();
-        updatePlayerData();
+        PlayerStorage.getInstance().savePlayers(this);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
@@ -91,7 +91,6 @@ public class EndViewActivity extends AppCompatActivity {
             player1.setDartsThrown(lastGame.getPlayer1throws() + player1.getDartsThrown());
             player1.setPlayedGames(player1.getPlayedGames() + 1);
             player1.setThreeDartAverage((player1.getThreeDartAverage() + ((501 - lastGame.getPlayer1score()) / (float) (lastGame.getPlayer1throws() / 3)))/2);
-            System.out.println(lastGame.getPlayer1score() + " " + lastGame.getPlayer1throws() + " " + player1.getThreeDartAverage());
         }
         if (player2 != null) {
             player2.setScore(lastGame.getPlayer2score());

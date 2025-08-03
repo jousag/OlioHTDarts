@@ -286,7 +286,7 @@ public class GameView extends AppCompatActivity {
             resetMultiplierButtons();
             updateInputViews();
             }
-        }        
+        }
 
         if (throwCount == 3) {
             Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
@@ -389,21 +389,22 @@ public class GameView extends AppCompatActivity {
     }
 
     private void finishGame(Player currentPlayer) {
+        throwCounter();
         String loserName;
         if (currentPlayer == selectedPlayers.get(0)) {
             loserName = selectedPlayers.get(1).getName();
         } else {
             loserName = selectedPlayers.get(0).getName();
         }
-        
+
         // Calculate the checkout value (score before the winning turn)
         int checkoutValue = getScoreBeforeTurn();
-        
+
         // Update highest checkout if this checkout is higher
         if (checkoutValue > currentPlayer.getHighestCheckout()) {
             currentPlayer.setHighestCheckout(checkoutValue);
         }
-        
+
         Game game = new Game(
                 GameId,
                 selectedPlayers.get(0).getName(),
@@ -424,6 +425,7 @@ public class GameView extends AppCompatActivity {
         game.setPlayer2(selectedPlayers.get(1).getName());
         game.setGameId(GameId);
         gameStorage.addGame(game);
+        System.out.println(player1throws + " " + player2throws);
         Intent intent = new Intent(this, EndViewActivity.class);
         startActivity(intent);
     }
