@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 public class GameHistory extends AppCompatActivity {
 
     private GameStorage gameStorage;
-
     private RecyclerView recyclerView;
 
     @Override

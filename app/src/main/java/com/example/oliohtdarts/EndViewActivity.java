@@ -22,7 +22,7 @@ public class EndViewActivity extends AppCompatActivity {
             Color.CYAN,
             Color.GREEN,
             Color.YELLOW,
-            Color.RED // Loop back to red
+            Color.RED
     };
     private GameStorage gameStorage;
     TextView winnerNameTextView;
@@ -39,24 +39,22 @@ public class EndViewActivity extends AppCompatActivity {
             winnerNameTextView.setText(gameStorage.getAllGames().get(gameStorage.getAllGames().size() - 1).getWinnerName());
 
             GameStorage.getInstance().saveGames(this); // Save the game data
-            updatePlayerData();
+            updatePlayerData(); // Update player data with the last game's results
             animateSmoothRainbow(winnerNameTextView);
             return insets;
         });
     }
-
     public void switchToNewMatch(View view) {
-        // Start a new match
+        PlayerStorage.getInstance().clearSelectedPlayers();
+        updatePlayerData();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
-
     public void switchToRematch(View view) {
         Intent intent = new Intent(this, GameView.class);
         startActivity(intent);
     }
-
-
+    // Animates the winner's name with a smooth rainbow effect
     private void animateSmoothRainbow(final TextView textView) {
         ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
         animator.setDuration(2000);
@@ -68,7 +66,6 @@ public class EndViewActivity extends AppCompatActivity {
         });
         animator.start();
     }
-
     // Interpolate between multiple rainbow colors
     private int getCurrentRainbowColor(float fraction) {
         int index = (int) (fraction * (rainbowColors.length - 1));
@@ -77,7 +74,6 @@ public class EndViewActivity extends AppCompatActivity {
 
         return blendColors(rainbowColors[index], rainbowColors[nextIndex], localFraction);
     }
-
     private int blendColors(int color1, int color2, float ratio) {
         final float inverseRatio = 1 - ratio;
         float r = Color.red(color1) * inverseRatio + Color.red(color2) * ratio;
@@ -85,7 +81,6 @@ public class EndViewActivity extends AppCompatActivity {
         float b = Color.blue(color1) * inverseRatio + Color.blue(color2) * ratio;
         return Color.rgb((int) r, (int) g, (int) b);
     }
-
     private void updatePlayerData(){
         Game lastGame = gameStorage.getAllGames().get(gameStorage.getAllGames().size() - 1);
         Player player1 = PlayerStorage.getInstance().getPlayerByName(lastGame.getPlayer1());
@@ -95,14 +90,16 @@ public class EndViewActivity extends AppCompatActivity {
             player1.setScore(lastGame.getPlayer1score());
             player1.setDartsThrown(lastGame.getPlayer1throws() + player1.getDartsThrown());
             player1.setPlayedGames(player1.getPlayedGames() + 1);
-            player1.setThreeDartAverage((501 - lastGame.getPlayer1score()) / (float) lastGame.getPlayer1throws() / 3);
+            player1.setThreeDartAverage((player1.getThreeDartAverage() + ((501 - lastGame.getPlayer1score()) / (float) (lastGame.getPlayer1throws() / 3)))/2);
+            System.out.println(lastGame.getPlayer1score() + " " + lastGame.getPlayer1throws() + " " + player1.getThreeDartAverage());
         }
         if (player2 != null) {
             player2.setScore(lastGame.getPlayer2score());
             player2.setDartsThrown(lastGame.getPlayer2throws() + player2.getDartsThrown());
             player2.setPlayedGames(player2.getPlayedGames() + 1);
-            player2.setThreeDartAverage((501 - lastGame.getPlayer2score())/ (float) (lastGame.getPlayer2throws() / 3));
+            player2.setThreeDartAverage((player2.getThreeDartAverage() + ((501 - lastGame.getPlayer2score()) / (float) (lastGame.getPlayer2throws() / 3)))/2);
         }
-    PlayerStorage.getInstance().savePlayers(this);
+    PlayerStorage.getInstance().savePlayers(this);// save the player data from the last game
     }
+
 }

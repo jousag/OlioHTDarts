@@ -3,6 +3,7 @@ package com.example.oliohtdarts;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -58,8 +59,9 @@ public class GameView extends AppCompatActivity {
 
     private final ArrayList<TextView> playerScoreViews = new ArrayList<>();
     private ArrayList<Player> selectedPlayers = new ArrayList<>();
-
     private GameStorage gameStorage;
+    MediaPlayer mediaPlayer;
+
     private final Map<String, String> checkoutCache = new HashMap<>();
     private boolean checkoutDataLoaded = false;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -118,6 +120,8 @@ public class GameView extends AppCompatActivity {
         inputView1 = findViewById(R.id.inputView1);
         inputView2 = findViewById(R.id.inputView2);
         inputView3 = findViewById(R.id.inputView3);
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.annoucer);
 
         PlayerStorage playerStorage = PlayerStorage.getInstance();
         selectedPlayers = playerStorage.getSelected();
@@ -266,10 +270,10 @@ public class GameView extends AppCompatActivity {
             throwCount++;
             
             int newScore = setCurrentScore();
-            
+
             // Call viewCheckout with the new score
             viewCheckout(newScore);
-            
+
             if (newScore == 1 || newScore < 0) {
                 bustTurn();
                 moveToNextPlayer();
@@ -392,7 +396,6 @@ public class GameView extends AppCompatActivity {
         } else {
             loserName = selectedPlayers.get(0).getName();
         }
-        System.out.println("Game finished! Winner: " + currentPlayer.getName() + ", Loser: " + loserName);
         Game game = new Game(
                 GameId,
                 selectedPlayers.get(0).getName(),
@@ -435,9 +438,9 @@ public class GameView extends AppCompatActivity {
 
     private void bustTurn() {
         Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
-        
+
         int scoreBeforeTurn = getScoreBeforeTurn();
-        
+
         currentPlayer.setScore(scoreBeforeTurn);
         playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(scoreBeforeTurn));
         
@@ -450,9 +453,7 @@ public class GameView extends AppCompatActivity {
                 break;
             }
         }
-        
         selectedThrows = new int[3];
-        throwCount = 0;
         
         // Reset multiplier buttons after bust
         nextMultiplier = 1;
@@ -468,7 +469,7 @@ public class GameView extends AppCompatActivity {
         currentPlayerIndex = (currentPlayerIndex + 1) % selectedPlayers.size();
         throwCount = 0;
         selectedThrows = new int[3];
-        updateCurrentPlayerUI();    
+        updateCurrentPlayerUI();
         Player currentPlayer = selectedPlayers.get(currentPlayerIndex);
         viewCheckout(currentPlayer.getScore());
     }
@@ -483,13 +484,22 @@ public class GameView extends AppCompatActivity {
                 currentTotal += selectedThrows[i];
             }
             int newScore = currentPlayer.getScore() - currentTotal;
-            
+            if (throwCount == 3 && currentTotal == 180) {
+                mediaPlayer.start();
+            }
             // Only update the UI display, don't change the actual player score yet
             playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
             
             return newScore;
         }
         return -1; // Return -1 if no valid player
+    }
+    private void throwCounter(){
+        if (currentPlayerIndex == 0) {
+            player1throws += throwCount;
+        } else if (currentPlayerIndex == 1) {
+            player2throws += throwCount;
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -522,7 +532,7 @@ public class GameView extends AppCompatActivity {
             }
         });
     }
-    
+
 
     @Override
     protected void onDestroy() {

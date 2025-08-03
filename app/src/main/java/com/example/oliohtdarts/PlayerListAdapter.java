@@ -2,7 +2,6 @@ package com.example.oliohtdarts;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.text.style.AlignmentSpan;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
