@@ -2,6 +2,7 @@ package com.example.oliohtdarts;
 
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -50,8 +51,8 @@ public class GameView extends AppCompatActivity {
 
     private ArrayList<TextView> playerScoreViews = new ArrayList<>();
     private ArrayList<Player> selectedPlayers = new ArrayList<>();
-
     private GameStorage gameStorage;
+    MediaPlayer mediaPlayer;
 
 
 
@@ -108,6 +109,8 @@ public class GameView extends AppCompatActivity {
         inputView2 = findViewById(R.id.inputView2);
         inputView3 = findViewById(R.id.inputView3);
 
+        mediaPlayer = MediaPlayer.create(this, R.raw.annoucer);
+
         PlayerStorage playerStorage = PlayerStorage.getInstance();
         selectedPlayers = playerStorage.getSelected();
         
@@ -152,9 +155,6 @@ public class GameView extends AppCompatActivity {
         
         // Set up button click listeners
         setupButtonListeners();
-
-        // clear selected players in PlayerStorage
-        playerStorage.clearSelectedPlayers();
     }
     
     private void setupButtonListeners() {
@@ -276,6 +276,7 @@ public class GameView extends AppCompatActivity {
                 finishGame(currentPlayer);
                 return; // Exit early if game is finished
             } else if (newScore > 1) {
+                System.out.println("New score for " + currentPlayer.getName() + ": " + newScore);
                 currentPlayer.setScore(newScore);
             } else {
                 bustTurn();
@@ -374,12 +375,13 @@ public class GameView extends AppCompatActivity {
     }
 
     private void finishGame(Player currentPlayer) {
+        throwCounter();
         if (currentPlayer == selectedPlayers.get(0)) {
             loserName = selectedPlayers.get(1).getName();
         } else {
             loserName = selectedPlayers.get(0).getName();
         }
-        System.out.println("Game finished! Winner: " + currentPlayer.getName() + ", Loser: " + loserName);
+        currentPlayer.setScore(0); // Set the current player's score to 0 to indicate they won
         Game game = new Game(
                 GameId,
                 selectedPlayers.get(0).getName(),
@@ -432,9 +434,7 @@ public class GameView extends AppCompatActivity {
                 break;
             }
         }
-        
         selectedThrows = new int[3];
-        throwCount = 0;
         
         // Reset multiplier buttons after bust
         nextMultiplier = 1;
@@ -442,11 +442,7 @@ public class GameView extends AppCompatActivity {
     }
 
     private void moveToNextPlayer() {
-            if (currentPlayerIndex == 0) {
-                player1throws += throwCount;
-            } else if (currentPlayerIndex == 1) {
-                player2throws += throwCount;
-            }
+        throwCounter();
         currentPlayerIndex = (currentPlayerIndex + 1) % selectedPlayers.size();
         throwCount = 0;
         selectedThrows = new int[3];
@@ -463,13 +459,24 @@ public class GameView extends AppCompatActivity {
                 currentTotal += selectedThrows[i];
             }
             int newScore = currentPlayer.getScore() - currentTotal;
-            
+            if (throwCount == 3 && currentTotal == 180) {
+                mediaPlayer.start();
+            }
             // Only update the UI display, don't change the actual player score yet
             playerScoreViews.get(currentPlayerIndex).setText(String.valueOf(newScore));
             
             return newScore;
         }
         return -1; // Return -1 if no valid player
+    }
+    private void throwCounter(){
+        if (currentPlayerIndex == 0) {
+            player1throws += throwCount;
+            System.out.println("Player 1 throws: " + player1throws);
+        } else if (currentPlayerIndex == 1) {
+            player2throws += throwCount;
+            System.out.println("Player 2 throws: " + player2throws);
+        }
     }
 
 }

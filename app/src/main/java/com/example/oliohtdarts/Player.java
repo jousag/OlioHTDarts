@@ -21,29 +21,31 @@ public class Player implements Serializable {
         image = R.drawable.dartsimage;
     }
 
+    // getters
     public String getName() {
         return name;
     }
     public int getScore() {
         return score;
     }
-    public void setScore(int score) {
-        this.score = score;
-    }
-    public void resetScore() {
-        this.score = 501; // Reset score to default starting value
-    }
+    public int getImage() {return image;}
+    public int getHighScore() {return highScore;}
+    public int getDartsThrown() {return DartsThrown;}
     public int getPlayedGames() {
         return playedGames;
     }
     public float getThreeDartAverage() {
         return ThreeDartAverage;
     }
+    // setters
+    public void setScore(int score) {
+        this.score = score;
+    }
+    public void resetScore() {
+        this.score = 501; // Reset score to default starting value
+    }
     public boolean isSelected() {return isSelected;}
     public void setSelected(boolean selected) {isSelected = selected;}
-    public int getImage() {return image;}
-    public int getHighScore() {return highScore;}
-    public int getDartsThrown() {return DartsThrown;}
     public void setDartsThrown(int dartsThrown) {DartsThrown = dartsThrown;}
     public void setPlayedGames(int playedGames) {this.playedGames = playedGames;}
     public void setThreeDartAverage (float threeDartAverage) {ThreeDartAverage = threeDartAverage;}

@@ -54,19 +54,8 @@ public class NewMatchActivity extends AppCompatActivity {
                     selectedPlayers ->  onPlayerClick(selectedPlayers)));
         } // Update the RecyclerView adapter with the latest player data
     }
-
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        for (Player player : PlayerStorage.getInstance().getPlayers()) {
-//            player.setSelected(false);
-//        }
-//        PlayerStorage.getInstance().savePlayers(this);
-//    }
-
-
     public void switchToMain(View view) {
-        playerStorage.clearSelectedPlayers();
+        playerStorage.clearSelectedPlayers(); // clear selected players when switching to main
         updateSelectedPlayersText(new ArrayList<>());
         playerStorage.savePlayers(this);
         Intent intent = new Intent(this, MainActivity.class);
@@ -85,6 +74,7 @@ public class NewMatchActivity extends AppCompatActivity {
         updateSelectedPlayersText(selectedPlayers);
     }
     public void updateSelectedPlayersText(List<String> selectedPlayers) {
+        // update the TextView with the selected players
         if (selectedPlayers.isEmpty()) {
             txtSelectedPlayers.setText("No players selected");
         } else {
@@ -99,7 +89,7 @@ public class NewMatchActivity extends AppCompatActivity {
     }
 
     public void switchToMatch(View view) {
-        if (playerStorage.getSelectedPlayers().size() == 2) {
+        if (playerStorage.getSelectedPlayers().size() == 2) { // Check if exactly two players are selected
             Intent intent = new Intent(this, GameView.class);
             startActivity(intent);
         } else {

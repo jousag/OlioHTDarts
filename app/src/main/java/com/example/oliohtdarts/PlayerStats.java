@@ -1,6 +1,5 @@
 package com.example.oliohtdarts;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,7 +13,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerStats extends AppCompatActivity {
@@ -70,7 +68,7 @@ public class PlayerStats extends AppCompatActivity {
     }
     public void switchToPlayerList(View view) {
         for (Player player : PlayerStorage.getInstance().getPlayers()) {
-            player.setSelected(false);
+            player.setSelected(false); // Deselect all players when switching to player list
         }
         Intent intent = new Intent(this, PlayerListActivity.class);
         startActivity(intent);
@@ -92,7 +90,7 @@ public class PlayerStats extends AppCompatActivity {
             }
         }
         PlayerStorage.getInstance().savePlayers(this);
-        // Save players to storage when the activity is paused
+        // Save latest player data after deleting a player
         Intent intent = new Intent(this, PlayerListActivity.class);
         startActivity(intent);
     }
